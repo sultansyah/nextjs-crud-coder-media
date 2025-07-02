@@ -5,6 +5,7 @@ import { EditButton, DeleteButton } from "@/components/buttons";
 import { Contact } from "@prisma/client";
 import { deleteContact } from "@/lib/action";
 import { useActionState } from "react";
+import React from "react";
 
 const ContactTableClient = ({ contacts }: { contacts: Contact[] }) => {
     const [stateDelete, formActionDelete] = useActionState(deleteContact, null)
@@ -23,8 +24,8 @@ const ContactTableClient = ({ contacts }: { contacts: Contact[] }) => {
 
             <tbody>
                 {contacts.map((contact: Contact, index: number) => (
-                    <>
-                        <tr key={contact.id} className="bg-white border-b">
+                    <React.Fragment key={contact.id}>
+                        <tr className="bg-white border-b">
                             <td className="py-3 px-6">{index + 1}</td>
                             <td className="py-3 px-6">{contact.name}</td>
                             <td className="py-3 px-6">{contact.phone}</td>
@@ -35,11 +36,15 @@ const ContactTableClient = ({ contacts }: { contacts: Contact[] }) => {
                             </td>
                         </tr>
                         <tr>
-                            <div id="name-error" aria-live="polite" aria-atomic="true">
-                                <p className="mt-2 text-sm text-red-500">{stateDelete?.error?.id ?? stateDelete?.error?.contact}</p>
-                            </div>
+                            <td colSpan={4}>
+                                <div id="contact-error" aria-live="polite">
+                                    <p className="text-red-500">
+                                        {stateDelete?.error?.id ?? stateDelete?.error?.contact}
+                                    </p>
+                                </div>
+                            </td>
                         </tr>
-                    </>
+                    </React.Fragment>
                 ))}
             </tbody>
         </table>

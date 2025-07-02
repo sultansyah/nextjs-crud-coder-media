@@ -2,10 +2,27 @@ import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { Contact } from "@prisma/client";
 
-export const getContacts = async (): Promise<Contact[]> => {
+export const getContacts = async (query: string, currentPage: Number): Promise<Contact[]> => {
     try {
         logger.info("fetching all contact");
-        const contacts = await prisma.contact.findMany();
+        const contacts = await prisma.contact.findMany({
+            where: {
+                OR: [
+                    {
+                        name: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    },
+                    {
+                        phone: {
+                            contains: query,
+                            mode: "insensitive"
+                        }
+                    }
+                ]
+            }
+        });
         return contacts;
     } catch (error) {
         logger.error(`Error fetching all contact: ${(error as Error).message}`);

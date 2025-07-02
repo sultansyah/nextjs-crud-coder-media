@@ -3,6 +3,8 @@ import { CreateButton } from "@/components/buttons"
 import Pagination from "@/components/pagination"
 import ContactTableServer from "@/components/contact-table-server"
 import { getContactsPages } from "@/lib/data"
+import { TableSkelaton } from "@/components/skelaton"
+import { Suspense } from "react"
 
 const Contacts = async ({
     searchParams
@@ -23,7 +25,9 @@ const Contacts = async ({
                 <Search />
                 <CreateButton />
             </div>
-            <ContactTableServer query={query} currentPage={currentPage} />
+            <Suspense key={query + currentPage} fallback={<TableSkelaton />}>
+                <ContactTableServer query={query} currentPage={currentPage} />
+            </Suspense>
             <div className="flex justify-center mt-4">
                 <Pagination totalPages={totalPages} />
             </div>

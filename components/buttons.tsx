@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { IoAddSharp, IoPencil, IoTrashOutline } from "react-icons/io5";
-import { useFormStatus } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 import clsx from "clsx";
+import { deleteContact } from "@/lib/action";
 
 export const CreateButton = () => {
     return (
@@ -28,12 +29,15 @@ export const EditButton = ({ id }: { id: string }) => {
     );
 };
 
-export const DeleteButton = () => {
+export const DeleteButton = ({ id, formAction }: { id: string, formAction: (formData: FormData) => void }) => {
     return (
-        <button className="rounded-sm border p-1 hover:bg-gray-100">
-            <IoTrashOutline size={20} />
-            Delete
-        </button>
+        <form action={formAction}>
+            <input type="hidden" name="id" value={id} />
+            <button className="rounded-sm border p-1 hover:bg-gray-100">
+                <IoTrashOutline size={20} />
+                Delete
+            </button>
+        </form>
     );
 };
 

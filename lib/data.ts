@@ -2,26 +2,35 @@ import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { Contact } from "@prisma/client";
 
-export const getContacts = async (query: string, currentPage: Number): Promise<Contact[]> => {
+const ITEMS_PER_PAGE = 5;
+
+export const getContacts = async (
+    query: string,
+    currentPage: number
+): Promise<Contact[]> => {
+    const offset = (currentPage - 1) * ITEMS_PER_PAGE
+
     try {
         logger.info("fetching all contact");
         const contacts = await prisma.contact.findMany({
+            skip: offset,
+            take: ITEMS_PER_PAGE,
             where: {
                 OR: [
                     {
                         name: {
                             contains: query,
-                            mode: "insensitive"
-                        }
+                            mode: "insensitive",
+                        },
                     },
                     {
                         phone: {
                             contains: query,
-                            mode: "insensitive"
-                        }
-                    }
-                ]
-            }
+                            mode: "insensitive",
+                        },
+                    },
+                ],
+            },
         });
         return contacts;
     } catch (error) {
@@ -39,7 +48,7 @@ export const getContactById = async (id: string): Promise<Contact | null> => {
         });
         if (!contact) {
             logger.warn(`Contact not found for id: ${id}`);
-            return null
+            return null;
         }
 
         logger.info(`Contact found: ${contact.name} (${contact.id})`);
@@ -49,5 +58,38 @@ export const getContactById = async (id: string): Promise<Contact | null> => {
             `Error fetching contact with id ${id}: ${(error as Error).message}`
         );
         throw new Error("Failed to fetch contact data");
+    }
+};
+
+
+export const getContactsPages = async (
+    query: string
+): Promise<number> => {
+    try {
+        logger.info("fetching contact pages");
+        const contacts = await prisma.contact.count({
+            where: {
+                OR: [
+                    {
+                        name: {
+                            contains: query,
+                            mode: "insensitive",
+                        },
+                    },
+                    {
+                        phone: {
+                            contains: query,
+                            mode: "insensitive",
+                        },
+                    },
+                ],
+            },
+        });
+
+        const totalPages = Math.ceil(Number(contacts)/ITEMS_PER_PAGE)
+        return totalPages;
+    } catch (error) {
+        logger.error(`Error fetching contact pages: ${(error as Error).message}`);
+        throw new Error("Failed to fetch contact pages");
     }
 };

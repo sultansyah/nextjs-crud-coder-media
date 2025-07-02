@@ -14,8 +14,8 @@ export const TableSkelaton = () => {
             </thead>
 
             <tbody className="animate-pulse">
-                {Array.from({ length: 5 }).map(_ => (
-                    <tr className="bg-white border-b border-gray-50">
+                {Array.from({ length: 5 }).map((_,i) => (
+                    <tr key={i} className="bg-white border-b border-gray-50">
                         <td className="py-3 px-6">
                             <div className="h-4 w-4 rounded bg-gray-100"></div>
                         </td>
